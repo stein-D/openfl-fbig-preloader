@@ -1,0 +1,42 @@
+package;
+
+import openfl.Lib;
+
+import openfl.display.Sprite;
+import openfl.display.StageAlign;
+import openfl.display.StageQuality;
+import openfl.display.StageScaleMode;
+
+import openfl.events.Event;
+import openfl.events.ProgressEvent;
+
+import js.Browser;
+import js.html.HTMLDocument;
+
+class PreloaderFB extends Sprite {
+	private var _document:HTMLDocument;	
+	
+	public function new () {
+		super ();		
+		_document = Browser.document; 
+		
+		Lib.current.stage.color 	= 0x000000;
+		Lib.current.stage.align	    = StageAlign.TOP;
+		Lib.current.stage.quality   = StageQuality.BEST;
+		Lib.current.stage.scaleMode = StageScaleMode.SHOW_ALL;		
+		
+		addEventListener (Event.COMPLETE, this_onComplete);
+		addEventListener (ProgressEvent.PROGRESS, this_onProgress);		
+	}
+	
+	private function this_onComplete (event:Event):Void {
+		_document.getElementById('openfl-content').style.opacity = "1";
+		untyped __js__(' FBInstant.startGameAsync().then(function() { console.log("start game") });');				
+	}
+	
+	
+	private function this_onProgress (event:ProgressEvent):Void {
+		var percent:Int = Math.ceil(event.bytesLoaded / event.bytesTotal * 100) ;
+		untyped __js__('FBInstant.setLoadingProgress(percent);');
+	}	
+}
